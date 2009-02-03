@@ -1,3 +1,6 @@
+#Covered by GPL V2.0
+#Coded by Carlos del Ojo Elias (deepbit@gmail.com)
+
 # -*- coding: utf-8 -*-
 
 # Form implementation generated from reading ui file 'mainform.ui'

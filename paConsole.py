@@ -216,7 +216,7 @@ save [sql/xss] [html/xml] - Save results to a file
 
 	def banner(self):
 		print '''-----------------------------------------------------
-ProxyStrike v2.0 by Carlos del Ojo Elias
+ProxyStrike v2.1 by Carlos del Ojo Elias
 Mail: cdelojo@edge-security.com
 
 Welcome to Proishenet console verison.

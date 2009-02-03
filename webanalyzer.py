@@ -1,3 +1,7 @@
+#Covered by GPL V2.0
+#Coded by Carlos del Ojo Elias (deepbit@gmail.com)
+
+
 import re
 from urlparse import urlparse,urlunparse
  

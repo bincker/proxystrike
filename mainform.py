@@ -818,7 +818,7 @@ class Ui_MainWindow(mainGUI):
 
 		
 	def funcion_About(self):
-		mb = QtGui.QMessageBox ("About","About ProxyStrike\n\nAUTHOR\n\nCarlos del Ojo Elias (deepbit)\ncdelojo@edge-security.com\n\nEDGE-SECURITY 2009",QtGui.QMessageBox.Information,QtGui.QMessageBox.Ok,0,0)
+		mb = QtGui.QMessageBox ("About","About ProxyStrike v2.1\n\nAUTHOR\n\nCarlos del Ojo Elias (deepbit)\ncdelojo@edge-security.com\n\nEDGE-SECURITY 2009",QtGui.QMessageBox.Information,QtGui.QMessageBox.Ok,0,0)
 		mb.exec_()
 
 	def close(self):
