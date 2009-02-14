@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1029</width>
-    <height>615</height>
+    <width>856</width>
+    <height>652</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -16,14 +16,6 @@
    <string/>
   </property>
   <widget class="QWidget" name="centralwidget" >
-   <property name="geometry" >
-    <rect>
-     <x>0</x>
-     <y>22</y>
-     <width>1029</width>
-     <height>571</height>
-    </rect>
-   </property>
    <layout class="QHBoxLayout" >
     <item>
      <widget class="QTabWidget" name="tabWidget" >
@@ -37,17 +29,9 @@
        <enum>Qt::NoFocus</enum>
       </property>
       <property name="currentIndex" >
-       <number>5</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="tab" >
-       <property name="geometry" >
-        <rect>
-         <x>0</x>
-         <y>0</y>
-         <width>999</width>
-         <height>524</height>
-        </rect>
-       </property>
        <attribute name="title" >
         <string>Comms</string>
        </attribute>
@@ -61,14 +45,6 @@
            <number>0</number>
           </property>
           <widget class="QWidget" name="page" >
-           <property name="geometry" >
-            <rect>
-             <x>0</x>
-             <y>0</y>
-             <width>997</width>
-             <height>522</height>
-            </rect>
-           </property>
            <layout class="QVBoxLayout" >
             <property name="margin" >
              <number>1</number>
@@ -306,14 +282,6 @@
                 <number>2</number>
                </property>
                <widget class="QWidget" name="tab_3" >
-                <property name="geometry" >
-                 <rect>
-                  <x>420</x>
-                  <y>315</y>
-                  <width>840</width>
-                  <height>420</height>
-                 </rect>
-                </property>
                 <attribute name="title" >
                  <string>Requests</string>
                 </attribute>
@@ -328,14 +296,6 @@
                 </layout>
                </widget>
                <widget class="QWidget" name="tab_4" >
-                <property name="geometry" >
-                 <rect>
-                  <x>420</x>
-                  <y>315</y>
-                  <width>840</width>
-                  <height>420</height>
-                 </rect>
-                </property>
                 <attribute name="title" >
                  <string>Responses</string>
                 </attribute>
@@ -350,14 +310,6 @@
                 </layout>
                </widget>
                <widget class="QWidget" name="tab_5" >
-                <property name="geometry" >
-                 <rect>
-                  <x>0</x>
-                  <y>0</y>
-                  <width>966</width>
-                  <height>196</height>
-                 </rect>
-                </property>
                 <attribute name="title" >
                  <string>Variables</string>
                 </attribute>
@@ -403,14 +355,6 @@
            </layout>
           </widget>
           <widget class="QWidget" name="page_2" >
-           <property name="geometry" >
-            <rect>
-             <x>0</x>
-             <y>0</y>
-             <width>100</width>
-             <height>30</height>
-            </rect>
-           </property>
            <layout class="QVBoxLayout" >
             <item>
              <widget class="QGroupBox" name="groupBox_2" >
@@ -570,14 +514,6 @@ p, li { white-space: pre-wrap; }
        </layout>
       </widget>
       <widget class="QWidget" name="tab_6" >
-       <property name="geometry" >
-        <rect>
-         <x>0</x>
-         <y>0</y>
-         <width>999</width>
-         <height>524</height>
-        </rect>
-       </property>
        <attribute name="title" >
         <string>Request Stats</string>
        </attribute>
@@ -629,14 +565,6 @@ p, li { white-space: pre-wrap; }
        </layout>
       </widget>
       <widget class="QWidget" name="tab_2" >
-       <property name="geometry" >
-        <rect>
-         <x>0</x>
-         <y>0</y>
-         <width>999</width>
-         <height>524</height>
-        </rect>
-       </property>
        <attribute name="title" >
         <string>Variable Stats</string>
        </attribute>
@@ -691,14 +619,6 @@ p, li { white-space: pre-wrap; }
        </layout>
       </widget>
       <widget class="QWidget" name="tab_7" >
-       <property name="geometry" >
-        <rect>
-         <x>0</x>
-         <y>0</y>
-         <width>999</width>
-         <height>524</height>
-        </rect>
-       </property>
        <attribute name="title" >
         <string>Config</string>
        </attribute>
@@ -891,14 +811,6 @@ p, li { white-space: pre-wrap; }
        </layout>
       </widget>
       <widget class="QWidget" name="tab_8" >
-       <property name="geometry" >
-        <rect>
-         <x>0</x>
-         <y>0</y>
-         <width>999</width>
-         <height>524</height>
-        </rect>
-       </property>
        <attribute name="title" >
         <string>Plugins</string>
        </attribute>
@@ -970,14 +882,6 @@ p, li { white-space: pre-wrap; }
            <number>0</number>
           </property>
           <widget class="QWidget" name="page_3" >
-           <property name="geometry" >
-            <rect>
-             <x>0</x>
-             <y>0</y>
-             <width>975</width>
-             <height>443</height>
-            </rect>
-           </property>
            <layout class="QVBoxLayout" >
             <property name="margin" >
              <number>1</number>
@@ -996,14 +900,6 @@ p, li { white-space: pre-wrap; }
        </layout>
       </widget>
       <widget class="QWidget" name="tab_9" >
-       <property name="geometry" >
-        <rect>
-         <x>0</x>
-         <y>0</y>
-         <width>999</width>
-         <height>524</height>
-        </rect>
-       </property>
        <attribute name="title" >
         <string>Log</string>
        </attribute>
@@ -1038,7 +934,7 @@ p, li { white-space: pre-wrap; }
            </layout>
           </item>
           <item>
-           <widget class="QPlainTextEdit" name="bgLogTextEdit" >
+           <widget class="QTextEdit" name="bgLogTextEdit" >
             <property name="readOnly" >
              <bool>true</bool>
             </property>
@@ -1112,14 +1008,6 @@ p, li { white-space: pre-wrap; }
        </layout>
       </widget>
       <widget class="QWidget" name="tab_10" >
-       <property name="geometry" >
-        <rect>
-         <x>0</x>
-         <y>0</y>
-         <width>999</width>
-         <height>524</height>
-        </rect>
-       </property>
        <attribute name="title" >
         <string>Repeat Request</string>
        </attribute>
@@ -1365,14 +1253,6 @@ p, li { white-space: pre-wrap; }
        </layout>
       </widget>
       <widget class="QWidget" name="tab_11" >
-       <property name="geometry" >
-        <rect>
-         <x>0</x>
-         <y>0</y>
-         <width>999</width>
-         <height>524</height>
-        </rect>
-       </property>
        <attribute name="title" >
         <string>Crawler</string>
        </attribute>
@@ -1631,12 +1511,12 @@ p, li { white-space: pre-wrap; }
              <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
 &lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
 p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:'Lucida Grande'; font-size:13pt; font-weight:400; font-style:normal;">
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Sans Serif'; font-size:9pt;">&lt;span style=" font-size:14pt;">Crawling process: The crawling process is performed by TWO threads&lt;br />to avoid web server overloading.&lt;/span>&lt;/p>
-&lt;p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Sans Serif'; font-size:14pt;">&lt;/p>
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Sans Serif'; font-size:14pt;">The urls detected can be forwarded to enabled plugins.&lt;/p>
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Sans Serif'; font-size:14pt;">Moreover detected forms are shown in the table and can be filled &lt;/p>
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Sans Serif'; font-size:14pt;">manually by double-clicking on each link. Enjoy!&lt;/p>&lt;/body>&lt;/html></string>
+&lt;/style>&lt;/head>&lt;body style=" font-family:'Sans Serif'; font-size:9pt; font-weight:400; font-style:normal;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-size:16pt; vertical-align:sub;">Crawling process: The crawling process is performed by TWO threads&lt;br />to avoid web server overloading.&lt;/span>&lt;/p>
+&lt;p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:16pt; vertical-align:sub;">&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:16pt; vertical-align:sub;">The urls detected can be forwarded to enabled plugins.&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:16pt; vertical-align:sub;">Moreover detected forms are shown in the table and can be filled &lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:16pt; vertical-align:sub;">manually by double-clicking on each link. Enjoy!&lt;/p>&lt;/body>&lt;/html></string>
             </property>
            </widget>
           </item>
@@ -1681,8 +1561,8 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1029</width>
-     <height>22</height>
+     <width>856</width>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuHelp" >
@@ -1697,14 +1577,6 @@ p, li { white-space: pre-wrap; }
   <widget class="QStatusBar" name="statusbar" >
    <property name="enabled" >
     <bool>false</bool>
-   </property>
-   <property name="geometry" >
-    <rect>
-     <x>0</x>
-     <y>593</y>
-     <width>1029</width>
-     <height>22</height>
-    </rect>
    </property>
    <property name="sizePolicy" >
     <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >

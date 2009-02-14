@@ -156,7 +156,7 @@ class Ui_MainWindow(mainGUI):
 		req=self.controller.getPluginResult(plugname,w)
 		if req:
 			self.requrlEdit.setText(req.schema)
-			self.reqTextEdit.setPlainText(req.getAll())
+			self.reqTextEdit.setText(req.getAll())
 			self.tabWidget.setCurrentIndex(6)
 			
 
@@ -217,7 +217,7 @@ class Ui_MainWindow(mainGUI):
 				QtCore.QObject.connect(tree, QtCore.SIGNAL("itemDoubleClicked(QTreeWidgetItem *,int)"), self.getPluginResult)
 
 			elif j["type"]=="text":
-				text = QtGui.QPlainTextEdit(page)
+				text = QtGui.QTextEdit(page)
 				text.setReadOnly(True)
 				text.setObjectName("text_"+str(number))
 				verticalLayout.addWidget(text)
@@ -438,7 +438,7 @@ class Ui_MainWindow(mainGUI):
 			self.requestEdit.clear()
 			self.requestEdit.append(requests[row].getAll())
 			self.responseEdit.clear()
-			self.responseEdit.setPlainText(requests[row].response.getAll())
+			self.responseEdit.setText(requests[row].response.getAll())
 			
 			self.tableWidget_2.clear()
 			self.tableWidget_2.setColumnCount(2)
@@ -708,7 +708,7 @@ class Ui_MainWindow(mainGUI):
 			i=i.strip()
 			if i:
 				data.append(i)
-		self.bgLogTextEdit.appendPlainText("\r\n".join(data))
+		self.bgLogTextEdit.append("\r\n".join(data))
 
 ##############################################################################################################################
 ##############################################################################################################################
@@ -771,7 +771,7 @@ class Ui_MainWindow(mainGUI):
 		if row > -1:
 			req=self.controller.getRequests()[row]
 			self.requrlEdit.setText(req.schema)
-			self.reqTextEdit.setPlainText(req.getAll())
+			self.reqTextEdit.setText(req.getAll())
 			self.tabWidget.setCurrentIndex(6)
 
 	def performRepeater(self):
@@ -810,7 +810,7 @@ class Ui_MainWindow(mainGUI):
 	def showResponse(self):
 		if self.newResponse:
 			if not self.diffButton.isChecked():
-				self.responseTextEdit.setPlainText(self.newResponse)
+				self.responseTextEdit.setText(self.newResponse)
 			else:
 				self.responseTextEdit.setHtml(textDiff(self.lastResponse,self.newResponse))
 			
