@@ -347,40 +347,131 @@ def test(engineO,text,qty):
 	
 
 if __name__=="__main__":
+	from consoleNg import Console
 
-	ys=YouTubeSearch("howto video")
-	for i in ys:
-		print i
-	sys.exit(0)
-#	test(ys,"YouTube search --> \"edge\" (getting 147 results): ",147)
+	class Cli(Console):
+		def __init__(self):
+			Console.__init__(self,"iSearch: [ NoEngine ] > ")
+
+			self.engines=[]
+			self.cur_engine=-1
+		
+			for i,j in globals().items():
+				if "getNResults" in dir(j) and i!='SearchEngine':
+					self.engines.append(i)
 
 
-	ys=GoogleSearch("\"edge-security\"")
-	test(ys,"Google search --> \"edge-security\" (getting 147 results): ",147)
+		def CMD_showe(self,*args):
+			'''1|showe|Show all engines'''
+			j=1
+			for i in self.engines:
+				print str(j)+".",i
+				j+=1
+
+		def CMD_use(self,*args):
+			'''2|use|Use one of the available engines'''
+			j=1
+			for i in self.engines:
+				print str(j)+".",i
+				j+=1
+			try:
+				n=int(raw_input("Select a number: "))
+			except:
+				return
+
+			self.prompt="iSearch:[ %s ] > " % (self.engines[n-1])
+			self.cur_engine=n-1
+
+		def CMD_search(self,*args):
+			'''3|search [query]|Perform a complete search using current search engine'''
+			if self.cur_engine<0:
+				raise Exception,"You must select an engine!! ('use' command)"
+
+			string=" ".join(args)
+			print string
+
+			se=globals()[self.engines[self.cur_engine]](string)
+			self.results=[]
+			j=0
+			print "Fetching results... WAIT PLEASE"
+			for i in se:
+				j+=1
+				self.results.append(i)
+			print j,"results fetched.\r\n"
+
+
+					
+		def CMD_searchN(self,*args):
+			'''4|searchN [number] [query]|Retrieve N results using current search engine'''
+			if self.cur_engine<0:
+				raise Exception,"You must select an engine!! ('use' command)"
+			n=int(args[0])
+			string=" ".join(args[1:])
+
+			se=globals()[self.engines[self.cur_engine]](string)
+			self.results=[]
+			j=0
+			print "Fetching results... WAIT PLEASE"
+			self.results=se.getNResults(n)
+			print len(self.results),"results fetched.\r\n"
+
+
+
+		def CMD_testall(self,*args):
+			'''5|testall|Test all engines'''
+			ys=YouTubeSearch("howto video")
+			test(ys,"YouTube search --> \"edge\" (getting 147 results): ",147)
+		
+			ys=GoogleSearch("\"edge-security\"")
+			test(ys,"Google search --> \"edge-security\" (getting 147 results): ",147)
+			
+			ys=YahooSearch("\"edge-security\"")
+			test(ys,"Yahoo search --> \"edge-security\" (getting 147 results): ",147)
+		
+			ys=Figator("divx")
+			test(ys,"Figator search --> \"divx\" (getting 147 results): ",147)
+		
+			ys=BaiduSearch("microsoft")
+			test(ys,"Baidu search --> \"microsoft\" (getting 147 results): ",147)
+		
+			ys=ScrapeTorrentSearch("divx")
+			test(ys,"ScrapeTorrent search --> \"divx\" (getting 95 results): ",95)
+		
+			ys=MininovaSearch("divx")
+			test(ys,"Mininova search --> \"divx\" (getting 255 results): ",255)
+		
+			ys=TorrentzSearch("tomtom")
+			test(ys,"Torrentz search --> \"tomtom\" (getting 147 results): ",147)
+		
+			ys=YandexSearch("edge-security")
+			test(ys,"Yandex search --> \"edge-security\" (getting 147 results): ",147)
+
+		def CMD_domains(self,*args):
+			'''6|domains|Replace results by its domain names'''
+			from urlparse import urlparse
+			doms={}
+			for i in self.results:
+				doms[urlparse(i)[1]]=True
+
+			self.results=doms.keys()
+
+		def CMD_sr(self,*args):
+			'''7|sr|Show results'''
+			for i in self.results:
+				print i
+
+		def CMD_grep(self,*args):
+			'''7|grep [regexp]|Show results matched against regexp'''
+			import re
+			exp=re.compile(" ".join(args))
+			for i in self.results:
+				if exp.findall(i):
+					print i
+
+				
+
 	
-
-	ys=YahooSearch("\"edge-security\"")
-	test(ys,"Yahoo search --> \"edge-security\" (getting 147 results): ",147)
-
-	ys=Figator("divx")
-	test(ys,"Figator search --> \"divx\" (getting 147 results): ",147)
-
-	ys=BaiduSearch("microsoft")
-	test(ys,"Baidu search --> \"microsoft\" (getting 147 results): ",147)
-
-	ys=ScrapeTorrentSearch("divx")
-	test(ys,"ScrapeTorrent search --> \"divx\" (getting 95 results): ",95)
-
-	ys=MininovaSearch("divx")
-	test(ys,"Mininova search --> \"divx\" (getting 255 results): ",255)
-
-	ys=TorrentzSearch("tomtom")
-	test(ys,"Torrentz search --> \"tomtom\" (getting 147 results): ",147)
-
-
-	ys=YandexSearch("edge-security")
-	test(ys,"Yandex search --> \"edge-security\" (getting 147 results): ",147)
-
+	a=Cli()
+	a.run()
 	
-
-	
+		

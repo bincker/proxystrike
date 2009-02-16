@@ -3,6 +3,10 @@
 
 import sys
 import traceback
+try:
+	import readline
+except:
+	pass
 
 class Console:
 	def __init__(self,prompt):
@@ -10,12 +14,20 @@ class Console:
 		self.banner=""
 
 		self.commands={}
-		self.cmdorder=[]
+		self.commandSort=[]
+
+
 		for i in dir(self):
 			if "CMD_"==i[:4]:
 				cmd=i.split("CMD_")[1].lower()
-				self.cmdorder.append(cmd)
 				self.commands[cmd]=getattr(self,i)
+				try:
+					self.commandSort.append((int(self.commands[cmd].__doc__.split("|")[0]),cmd))
+				except:
+					print ("Docstring for command must have the following format: '(number)|(string)[|(string)]+' # Two or more strings")
+		
+		self.commandSort.sort()
+		self.commandSort=[i[1] for i in self.commandSort]
 
 		#######   DEFAULT VARS (begins with CFG_)  ###########################
 		self.CFG_DEBUG=False
@@ -25,7 +37,6 @@ class Console:
 			if "CFG_"==i[:4]:
 				var=i.split("CFG_")[1]
 				self.configvars[var]=i
-
 
 	def run(self):
 		while True:
@@ -39,16 +50,11 @@ class Console:
 			except Exception,a:
 				self.printError (a)
 
-		self.exit()
+		print ("\r\n\r\nBye!...")
 
-		print "\r\n\r\nBye!..."
-
-
-	def exit(self):
-		pass
 
 	def printError(self,err):
-		sys.stderr.write("-- Error: %s\r\n" % (str(err)))
+		sys.stderr.write("-- Error: %s\r\n" % (str(err),))
 		if self.CFG_DEBUG:
 			pass
 
@@ -60,41 +66,87 @@ class Console:
 		cmd,parameters=words[0].lower(),words[1:]
 
 		if not cmd in self.commands:
-			raise Exception,"Command '"+cmd+"' not found. Try 'help'\r\n"
+			raise Exception("Command '"+cmd+"' not found. Try 'help'\r\n")
 
 		self.commands[cmd](*parameters)
 
 	######## DEFAULT COMMANDS (begins with CMD_) ################
 
 	def CMD_help(self,*args):
-		'''help					- Show's help'''
-		print self.banner
+		'''-3|help|Show's help'''
+		print (self.banner)
 
-		print "help"
-		print "-----------------------------------------------------------------"
-		print
 
-		for i in self.cmdorder:
-			print "%s" % (self.commands[i].__doc__)
+		alldata=[]
+		lengths=[]
 
+		for i in self.commandSort:
+			alldata.append(self.commands[i].__doc__.split("|")[1:])
+
+		for i in alldata:
+			if len(i) > len(lengths):
+				for j in range(len(i)-len(lengths)):
+					lengths.append(0)
+
+			j=0
+			while j<len(i):
+				if len(i[j])>lengths[j]:
+					lengths[j]=len(i[j])
+				j+=1
+
+		print ("Help")
+		print ("-"* (lengths[0]+lengths[1]+4))
+		print 
+
+		for i in alldata:
+			print (("%-"+str(lengths[0])+"s  - %-"+str(lengths[1])+"s") % (i[0],i[1]))#lengths))
+			if len(i)>2:
+				for j in i[2:]:
+					print (("%"+str(lengths[0]+9)+"s* %s") % (" ",j))
+				print 
+
+
+			
 		print
 
 
 	def CMD_config(self,*args):
-		'''config					- Show config variables'''
-		print "Configuration variables\r\n---------------------------------------------"
+		'''-2|config|Show config variables'''
+		print ("Configuration variables\r\n"+"-"*79)
 		for i,j in self.configvars.items():
-			print "|%20s | %20s|" % (i,getattr(self,j))
+			value=self.parfmt(repr(getattr(self,j)),52)
+			print ("| %20s | %52s |" % (i,value[0]))
+			for k in value[1:]:
+				print ("| %20s | %52s |" % ("",k))
+			if len(value)>1:
+				print("| %20s | %52s |" % ("",""))
 
-		print
+		print ("-"*79)
+
+		print 
+
+	def parfmt(self,txt,width):
+		res=[]
+		pos=0
+		while True:
+			a=txt[pos:pos+width]
+			if not a:
+				break
+			res.append(a)
+			pos+=width
+
+		return res
+		
 
 	def CMD_set(self,*args):
-		'''set [variable_name] [value]		- Set configuration variable value
-					Values are python expressions: 1, True, "How are you".lower()'''
+		'''-1|set [variable_name] [value]|Set configuration variable value|Values are python expressions: 1, True, "How are you".lower()'''
 		value=" ".join(args[1:])
 
 		if args[0] not in self.configvars:
-			raise Exception,"Variable %s doesn't exist" % (args[0])
+			raise Exception("Variable %s doesn't exist" % (args[0]))
 
 		setattr(self,"CFG_"+args[0],eval(value))
 
+if __name__=="__main__":
+	a=Console("Prompt> ")
+	a.run()

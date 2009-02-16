@@ -168,20 +168,20 @@ class DCrawl(consoleNg.Console):
 
 	
 	def CMD_append(self,*args):
-		'''append [url]				- add an Url to the crawler POOL'''
+		'''1|append [url]|add an Url to the crawler POOL'''
 		self.append(args[0])
 
 	def CMD_setCookie(self,*args):
-		'''setCookie [ck]				- Set cookie for crawling'''
+		'''2|setCookie [ck]|Set cookie for crawling'''
 		self.setCookie(args[0])
 		
 
 	def CMD_status(self,*args):
-		'''status					- prints urls_done/remaining_urls'''
+		'''3|status|prints urls_done/remaining_urls'''
 		print self.doneUrls,"/",self.totalUrls
 
 	def CMD_wait(self,*args):
-		'''wait					- Waits for crawler to finish'''
+		'''4|wait|Waits for crawler to finish'''
 		try:
 			while self.running:
 				print self.doneUrls,"/",self.totalUrls
@@ -190,7 +190,7 @@ class DCrawl(consoleNg.Console):
 			print "Wait command interrupted"
 
 	def CMD_tohtml(self,*args):
-		'''tohtml					- Writes results to html and open webbrowser'''
+		'''9|tohtml|Writes results to html and open webbrowser'''
 
 		forms="".join([ "Form: <a href='"+i+"'>"+i+"</a><br>" for i in self.FormAnalysis.formSummary().values()])
 		dynurls= "".join([ "<a href='"+i+"'>"+i+"</a><br>" for i in self.FormAnalysis.getDynPages()])
@@ -208,24 +208,24 @@ class DCrawl(consoleNg.Console):
 		webbrowser.open("temp.html")
 
 	def CMD_stop(self,*args):
-		'''stop						- Stops crawling process'''
+		'''5|stop|Stops crawling process'''
 		print "Stopping..."
 		self.stop()
 		print "Stopped! ;D"
 
 	def CMD_restart(self,*args):
-		'''restart				- restart Crawling process'''
+		'''6|restart|restart Crawling process'''
 		self.restart()
 
 	def CMD_testsearch(self,*args):
-		'''testsearch [url]			- Perform a search to test Link detector'''
+		'''7|testsearch [url]|Perform a search to test Link detector'''
 		i=SearchLinks(args[0])
 		i.addCookie(self.CFG_cookie)
 		for j in i:
 			print j
 
 	def CMD_dumpurls(self,*args):
-		'''dumpurls 				- Dump valid url's in dumpurls.txt'''
+		'''8|dumpurls|Dump valid url's in dumpurls.txt'''
 		f=open("dumpurls.txt","w")
 		for i in self.urlOKS:
 			f.write(i+"\r\n")
