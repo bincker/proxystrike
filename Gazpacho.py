@@ -9,13 +9,14 @@ import copy
 from xml.dom.minidom import Document
 
 
-XSS_SET={
-'XSS\'PWNR': "' (Single Quotes)",
-'XSS"PWNR': '" (Double Quotes)',
-'XS<SP>WNR': '<, > (Less than and great than symbols)',
-'XS(SP)WNR': '( ) (Parenthesis)',
-'XS-<SCRIPT>alert(document.cookie)</SCRIPT>-SPWNR' : 'Scripting keywords enabled'
-}
+XSS_SET=[
+["<!--%23echo%20var='HTTP_USER_AGENT'%20-->" , "XSSIPWNR" , "SERVER SIDE INCLUDE"],
+['XSS\'PWNR', 'XSS\'PWNR', "' (Single Quotes)"],
+['XSS"PWNR','XSS"PWNR' ,'" (Double Quotes)'],
+['XS<SP>WNR','XS<SP>WNR' ,'<, > (Less than and great than symbols)'],
+['XS(SP)WNR','XS(SP)WNR' ,'( ) (Parenthesis)'],
+['XS-<SCRIPT>alert(document.cookie)</SCRIPT>-SPWNR','XS-<SCRIPT>alert(document.cookie)</SCRIPT>-SPWNR' ,'Scripting keywords enabled']
+]
 
 CARS=['<','>',"'",'(',')']
 
@@ -44,6 +45,7 @@ class crossiter:
 	''' Container of request variants ''' 
 	def __init__(self,req,str="gp"):
 		self.req=req
+		self.req.addHeader("User-Agent","Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.XSSIPWNR)")
 		self.GET=False
 		self.POST=False
 
@@ -192,7 +194,7 @@ class crossiter:
 			AVAIL_ENCS=self.testEncoding(var)
 	
 			
-			for x,y in XSS_SET.items():
+			for x,z,y in XSS_SET:
 				for enco, desc in AVAIL_ENCS:
 					xx = ''
 					if enco:
@@ -202,9 +204,9 @@ class crossiter:
 						xx=x
 
 					logging.debug('\t\tTrying %s (%s) (%s)...' % (var.name, y, desc))
-					if self.perform(xx, x,var):
+					if self.perform(xx, z,var):
 						logging.debug('\t\t%s: %s (%s)' % (var.name,y, desc))
-						setout.append(XSS_SET[x] + " " + "(%s)" %(desc))
+						setout.append(y + " " + "(%s)" %(desc))
 
 						logging.debug('\t\tIf encoding works we dont try next...')
 						break;

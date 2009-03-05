@@ -139,7 +139,7 @@ class AttackMod_sqPyfia(AttackPlugin):
 class AttackMod_gazpacio(AttackPlugin):
 	def __init__(self):
 		# Name, variableSet ,iface, infoType, fields
-		AttackPlugin.__init__(self,"XSS attacks",True,True,"tree",["Url","Variable","Method","Injections Available"])
+		AttackPlugin.__init__(self,"XSS & SSI attacks",True,True,"tree",["Url","Variable","Method","Injections Available"])
 		
 		
 	def process(self,req):
@@ -151,7 +151,7 @@ class AttackMod_gazpacio(AttackPlugin):
 			if not xml:
 				return
 			htmlres=[req.completeUrl,c.getRAWResults()]
-
+	
 			self.htmlRESULTS.append(htmlres)
 			
 			restratados=htmlres[1]
@@ -160,10 +160,10 @@ class AttackMod_gazpacio(AttackPlugin):
 			for i in restratados:
 				if i[0]:
 					newres.append([i[2],i[1],"\r\n".join(i[3])])
-
+	
 			newres=[req.completeUrl,newres]
 			
-
+	
 			self.xmlRESULTS.append(xml.childNodes[0].childNodes[0])
 			self.newRESULTS.append(newres)
 			self.RESULTS.append([req.completeUrl,newres])

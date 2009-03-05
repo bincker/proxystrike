@@ -154,7 +154,7 @@ class AttackPlugin:
 			return True
 		return False
 
-	def __clearCache(self):
+	def clearCache(self):
 		self.cache={}
 
 	def getResults(self):
