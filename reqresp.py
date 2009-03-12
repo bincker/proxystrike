@@ -22,7 +22,7 @@ except:
 
 mutex=1
 Semaphore_Mutex=threading.BoundedSemaphore(value=mutex)
-REQLOG=False
+REQLOG=True
 
 class Variable:
 	def __init__(self,name,value="",extraInfo=""):

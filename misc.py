@@ -24,8 +24,21 @@ def getResponseWords (resp):   ### Divide una response en las palabras que la co
 	words=words.keys()
 	words.sort()
 
-
 	return words
+
+def distance(words1,words2):
+
+	if len(words2)>len(words1):
+		tmp=words1
+		words1=words2
+		words2=tmp
+
+	words3=[]
+	for i in words2:
+		if i in words1:
+			words3.append(i)
+
+	return len(words3)*100/len(words1)
 
 def getRESPONSEMd5 (resp):      ### Obtiene el MD5 de una response
 	return md5.new(" ".join(getResponseWords(resp))).hexdigest()

@@ -54,6 +54,7 @@ class DynamicErrWord(DynamicAbs):
 		self.word=None
 
 	def addOrigResponse (self,OrigResponse):
+		print "ORIGWORDS!!!!!"
 		self.origWords=getRESPONSEMd5(OrigResponse)
 
 	def getInfo(self,BadResponse):
@@ -76,13 +77,37 @@ class DynamicErrWord(DynamicAbs):
 		return True
 		
 
+class DynamicWordsDistance(DynamicAbs):
+	'''Abstraccion basada en distancia de vector de palabras'''
+	def __init__(self,var,method,req):
+		DynamicAbs.__init__(self,var,method,req)
+
+	def addOrigResponse (self,OrigResponse):
+		self.origWords=getResponseWords(OrigResponse)
+
+	def getInfo(self,BadResponse):
+		'''Devuelve CIERTO si HAY DIFERENCIAS despues de una INYECCION'''
+		newWords=getResponseWords(BadResponse)
+
+		dis=distance(self.origWords,newWords)
+
+		logging.debug("\tequal Response - Orig: %s, Current: %s, distance: %d" % (len(self.origWords),len(newWords),dis))
+		if dis<90:
+			return True
+		
+		return False
+
+	def equalResponse(self,Response):
+		return not self.getInfo(Response)
+
+
 
 
 class sqPyfia:
 
 	def __init__(self,req):
 		self.req=req
-		req.setTotalTimeout(10)
+		req.setTotalTimeout(100)
 
 		self.dynamics=[]
 		self.injResults=[]
@@ -169,6 +194,9 @@ class sqPyfia:
 			else:
 				var=req.getPOSTVars()[pos]
 
+#			if var.name!="statList":
+#				raise Exception
+
 			logging.debug("Trying dynamic parameter - "+method+" - "+var.name)
 
 			var.append("x,'\"QnoVale")
@@ -178,7 +206,8 @@ class sqPyfia:
 			HTMLNew=req.response
 			HTMLNew.Substitute("x,'\"QnoVale","")
 	
-			DynObj=DynamicErrWord(var,method,req)
+			#DynObj=DynamicErrWord(var,method,req)
+			DynObj=DynamicWordsDistance(var,method,req)
 			DynObj.addOrigResponse(self.origResponse)
 			
 			var.restore()
@@ -313,7 +342,7 @@ if __name__=="__main__":
 		print "Usage: ./sqPyfia [--xml] [-D(ebug)] [-d POSTDATA] [-b COOKIE] [-x PROXY] URL"
 		sys.exit(-1)
 	attacker=sqPyfia(a)
-	attacker.setThreaded(4)
+	attacker.setThreaded(10)
 	attacker.launch()
 	if "--xml" in optsd:
 		print attacker.getXMLResults().toprettyxml(indent="\t")

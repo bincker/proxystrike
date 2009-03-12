@@ -180,7 +180,7 @@ tmp.addTry("\" and NoVale",False)
 InjTests.append(tmp)
 
 tmp=InjectTry(TNumeric)
-tmp.addTry("-21+21*01",True)
+tmp.addTry("-21+21",True)
 tmp.addTry("-21",False)
 tmp.addTry("-NoVale",False)
 InjTests.append(tmp)
