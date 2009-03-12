@@ -27,6 +27,12 @@ def getResponseWords (resp):   ### Divide una response en las palabras que la co
 	return words
 
 def distance(words1,words2):
+	if not len(words1):
+		words1.append('')
+
+#	print words1
+#	print "-------============-----------"
+#	print words2
 
 	if len(words2)>len(words1):
 		tmp=words1

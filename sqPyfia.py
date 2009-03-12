@@ -194,9 +194,6 @@ class sqPyfia:
 			else:
 				var=req.getPOSTVars()[pos]
 
-#			if var.name!="statList":
-#				raise Exception
-
 			logging.debug("Trying dynamic parameter - "+method+" - "+var.name)
 
 			var.append("x,'\"QnoVale")
