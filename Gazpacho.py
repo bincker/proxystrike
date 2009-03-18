@@ -43,7 +43,8 @@ STRENCODED+="-XSSPWNR2"
 
 class crossiter:
 	''' Container of request variants ''' 
-	def __init__(self,req,str="gp"):
+	def __init__(self,req,str="gp",logger=logging.getLogger()):
+		self.logger=logger
 		self.req=req
 		self.req.addHeader("User-Agent","Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.XSSIPWNR)")
 		self.GET=False
@@ -103,6 +104,7 @@ class crossiter:
 			return []
 
 	def __iter__ (self):
+		self.logger.debug("================== XSS/SSI ====================\r\n%s\r\n=============================================" % (str(self.req)))
 		self.posGET=0
 		self.posPOST=0
 		return self
@@ -171,6 +173,7 @@ class crossiter:
 			self.posPOST+=1
 
 		else:
+			self.logger.debug("++++++++++++++++++ FINISH XSS/SSI +++++++++++++++++\r\n%s\r\n+++++++++++++++++++++++++++++++++++++++++++++++++++" % (str(self.req)))
 			raise StopIteration
 
 		var.update("XSSPWNR")
@@ -183,12 +186,12 @@ class crossiter:
 				pass
 
 		var.restore()
-		
-		logging.debug('\tTrying %s...' % (var.name))
+	
+		self.logger.debug('\tTrying %s...' % (var.name))
 		
 
 		if self.req.response.getContent().count("XSSPWNR"):
-			logging.debug('\t\t%s: Single string injectable' % (var.name))
+			self.logger.debug('\t\t%s: Single string injectable' % (var.name))
 			setout=[]
 
 			AVAIL_ENCS=self.testEncoding(var)
@@ -203,12 +206,12 @@ class crossiter:
 					else:
 						xx=x
 
-					logging.debug('\t\tTrying %s (%s) (%s)...' % (var.name, y, desc))
+					self.logger.debug('\t\tTrying %s (%s) (%s)...' % (var.name, y, desc))
 					if self.perform(xx, z,var):
-						logging.debug('\t\t%s: %s (%s)' % (var.name,y, desc))
+						self.logger.debug('\t\t%s: %s (%s)' % (var.name,y, desc))
 						setout.append(y + " " + "(%s)" %(desc))
 
-						logging.debug('\t\tIf encoding works we dont try next...')
+			#			self.logger.debug('\t\tIf encoding works we dont try next...')
 						break;
 
 			return (True,method,var.name,setout,var.value)

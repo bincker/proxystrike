@@ -140,7 +140,7 @@ class AttackMod_gazpacio(AttackPlugin):
 		
 		
 	def process(self,req):
-		c=crossiter(req,"gp")
+		c=crossiter(req,"gp",self.LOG)
 		try:
 			c.launch()
 	
