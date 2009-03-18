@@ -705,10 +705,11 @@ class Ui_MainWindow(mainGUI):
 	def updateLogData(self):
 		data=[]
 		for i in self.controller.getPluginLogs():
-			i=i.strip()
-			if i:
+			i=i.rstrip()
+			if len(i):
 				data.append(i)
-		self.bgLogTextEdit.append("\r\n".join(data))
+		if len(data):
+			self.bgLogTextEdit.append("\r\n".join(data))
 
 ##############################################################################################################################
 ##############################################################################################################################

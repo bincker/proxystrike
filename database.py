@@ -215,4 +215,16 @@ SQLiteDB.AddConfirm(TDoubleQuote,	"\" and last_insert_rowid()=last_insert_rowid(
 SQLiteDB.AddConfirm(TNumeric, 		"-(last_insert_rowid()-last_insert_rowid())")
 SQLiteDB.AddConfirm(TConcatPipe, 	"'||substr(1,1,(last_insert_rowid()-last_insert_rowid()))||'")
 
-
+		
+		
+FingerTests=[]
+FingerTests.append(MysqlDB)
+FingerTests.append(MSSQLDB)
+FingerTests.append(OracleDB)
+FingerTests.append(DB2DB)
+FingerTests.append(PostgreSQLDB)
+FingerTests.append(InformixDB)
+FingerTests.append(SybaseDB)
+FingerTests.append(MSAccessDB)
+FingerTests.append(PointbaseDB)
+FingerTests.append(SQLiteDB)

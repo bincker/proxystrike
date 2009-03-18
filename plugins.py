@@ -94,13 +94,10 @@ class AttackMod_sqPyfia(AttackPlugin):
 		AttackPlugin.__init__(self,"Sql attacks",True,True,"tree",["Url","Variable","Method","Injection Type","DB Fingerprint","DB Error"])
 
 	def process(self,req):
-		sq=sqPyfia.sqPyfia(req)
+		sq=sqPyfia.sqPyfia(req,self.LOG)
 		sq.setThreaded(1)
 		try:
 			sq.launch()
-			a=sq.getLogs()
-			if a:
-				raise Exception," ".join(a)
 	
 			res=sq.getRAWResults()
 			xml=sq.getXMLResults()
@@ -112,7 +109,7 @@ class AttackMod_sqPyfia(AttackPlugin):
 				self.Semaphore_Mutex.release()
 
 		except Exception,a:
-			raise Exception,"SqlInj Engine: "+str(a)+" - "+"Fallo en SQL, REQ="+str(req)
+			self.LOG.debug("SqlInj Engine: "+str(a)+" - "+"Fallo en SQL, REQ="+str(req))
 
 
 	def getXML(self):

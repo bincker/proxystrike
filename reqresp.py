@@ -22,7 +22,7 @@ except:
 
 mutex=1
 Semaphore_Mutex=threading.BoundedSemaphore(value=mutex)
-REQLOG=False
+REQLOG=True
 
 class Variable:
 	def __init__(self,name,value="",extraInfo=""):
@@ -319,7 +319,7 @@ class Request:
 
 	def addHeader (self,key,value):
 		k=string.capwords(key,"-")
-		if k not in ["Accept-Encoding","Content-Length"]:
+		if k.lower() not in ["accept-encoding","content-length","if-modified-since","if-none-match"]:
 			self.__headers[k]=value
 
 	def __getitem__ (self,key):

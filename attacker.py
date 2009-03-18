@@ -2,17 +2,44 @@
 #Covered by GPL V2.0
 #Coded by Carlos del Ojo Elias (deepbit@gmail.com)
 
-import logging
 import plugins
 import copy
+from logging import Logger,Handler
+import threading
 
-#logging.basicConfig(level=logging.DEBUG,format='%(levelname)s ==> \t%(message)s')
+class PluginLogger(Logger):
+	def __init__(self):
+		Logger.__init__(self,"PluginLogger")
+
+	def getInfo(self):
+		return self.handlers[0].getAllInfo()
+
+class PluginLogHandler(Handler):
+	def __init__(self):
+		self.mutex=threading.BoundedSemaphore(value=1)
+		Handler.__init__(self)
+		self.info=[]
+
+	def handle(self,record):
+		self.mutex.acquire()
+		self.info.append(record.msg)
+		self.mutex.release()
+
+	def getAllInfo(self):
+		self.mutex.acquire()
+		a=self.info
+		self.info=[]
+		self.mutex.release()
+		return a
+
 
 class Attacker():
 
 	def __init__ (self):
 		self.__proxy=None
 		self.plugins={}
+		self.__LOGGER=PluginLogger()
+		self.__LOGGER.addHandler(PluginLogHandler())
 		self.getPlugins()
 
 	def setProxy(self,str):
@@ -22,8 +49,6 @@ class Attacker():
 	def clearCache(self):
 		self.__paths={}
 
-	def getLogs(self):
-		return self.__LOGGER.values()
 
 	def enablePlugin(self,name,bl):
 		self.plugins[name].setEnabled(bl)
@@ -35,11 +60,7 @@ class Attacker():
 		self.plugins[name].clearCache()
 
 	def getPluginLogs(self):
-		res=[]
-		for i in self.plugins.values():
-			res+=i.getLOG()
-
-		return res
+		return self.__LOGGER.getInfo()
 
 
 	def addReq(self,req):
@@ -61,6 +82,7 @@ class Attacker():
 		plugs=[i for i in dir(plugins) if "AttackMod_" in i]
 		for i in plugs:
 			pl=getattr(plugins,i)()
+			pl.setLogger(self.__LOGGER)
 			self.plugins[pl.pluginName]=pl
 
 	def getNewResults(self):

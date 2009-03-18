@@ -3,13 +3,14 @@
 
 import threading
 import time
+import logging
 
 ###############################################################################################################
 ###################################           Plugins interface             ###################################
 ###############################################################################################################
 
 class AttackPlugin:
-	def __init__(self,name,variableSet,iface,type,fields=[],):
+	def __init__(self,name,variableSet,iface,type,fields=[]):
 
 		self.variableSet=variableSet               # if Variable set== True --> All traffic is processed, else only requests with uniq variable sets
 
@@ -44,13 +45,10 @@ class AttackPlugin:
 		self.htmlRESULTS=[]                 ## free
 		self.reqRESULTS=[]                  ## request result objects (optional)
 
-		self.LOG=[]
-		
-	def getLOG(self):
-		res=self.LOG[:]
-		self.LOG=[]
-		return res
-		
+		self.LOG=logging.getLogger()
+	
+	def setLogger(self,loger):
+		self.LOG=loger
 
 	def putRESULTS(self,res,req=None):
 		self.RESULTS.append(res)
@@ -117,7 +115,7 @@ class AttackPlugin:
 		try:
 			self.process(req)
 		except Exception,a:
-			self.LOG.append(str(a))
+			self.LOG.debug(str(a))
 			
 	
 		self.Semaphore_Mutex.acquire()
