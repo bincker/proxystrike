@@ -22,7 +22,7 @@ except:
 
 mutex=1
 Semaphore_Mutex=threading.BoundedSemaphore(value=mutex)
-REQLOG=False
+REQLOG=True
 
 class Variable:
 	def __init__(self,name,value="",extraInfo=""):
@@ -321,6 +321,10 @@ class Request:
 		k=string.capwords(key,"-")
 		if k.lower() not in ["accept-encoding","content-length","if-modified-since","if-none-match"]:
 			self.__headers[k]=value
+
+	def delHeader (self,key):
+		k=string.capwords(key,"-")
+		del self.__headers[k]
 
 	def __getitem__ (self,key):
 		k=string.capwords(key,"-")
