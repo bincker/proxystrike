@@ -346,7 +346,6 @@ class Proxynet:
 	exclude=None
 	__header={}
 	__get_sign=""
-	__limitpath=""
 	__USEPROXY=None
 
 	__port=8008
@@ -402,10 +401,6 @@ class Proxynet:
 			Proxynet.__header[var]=value
 
 
-	@staticmethod
-	def limitPath(regexp):
-		Proxynet.__limitpath=regexp
-
 
 	@staticmethod
 	def get_signGET():
@@ -418,9 +413,6 @@ class Proxynet:
 		else:
 			return ()
 
-	@staticmethod
-	def get_limitpath():
-		return Proxynet.__limitpath
 
 
 ############# PROXY STUFF ######################
@@ -476,12 +468,11 @@ class Proxynet:
 
 	@staticmethod
 	def addRequest(r):
-		if re.findall(Proxynet.get_limitpath(),r.completeUrl):
-			if not re.search(Proxynet.exclude,r.urlWithoutVariables.lower()):	
-				Semaphore_Mutex.acquire()
-				Proxynet.__PROXY_REQUESTS+=[r]
-				Proxynet.__nreqs+=1
-				Semaphore_Mutex.release()
+		if not re.search(Proxynet.exclude,r.urlWithoutVariables.lower()):	
+			Semaphore_Mutex.acquire()
+			Proxynet.__PROXY_REQUESTS+=[r]
+			Proxynet.__nreqs+=1
+			Semaphore_Mutex.release()
 		
 		
 	@staticmethod
@@ -511,10 +502,9 @@ class Proxynet:
 	def addRequests (reqs):
 		Semaphore_Mutex.acquire()
 		for i in reqs:
-			if re.findall(Proxynet.get_limitpath(),i.completeUrl):
-				if not re.search(Proxynet.exclude,i.urlWithoutVariables.lower()):	
-					Proxynet.__PROXY_REQUESTS+=[i]
-					Proxynet.__nreqs+=1
+			if not re.search(Proxynet.exclude,i.urlWithoutVariables.lower()):	
+				Proxynet.__PROXY_REQUESTS+=[i]
+				Proxynet.__nreqs+=1
 		Semaphore_Mutex.release()
 			
 	

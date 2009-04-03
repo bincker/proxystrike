@@ -56,7 +56,6 @@ class DynamicErrWord(DynamicAbs):
 		self.logger=logger
 
 	def addOrigResponse (self,OrigResponse):
-		print "ORIGWORDS!!!!!"
 		self.origWords=getRESPONSEMd5(OrigResponse)
 
 	def getInfo(self,BadResponse):
@@ -104,6 +103,34 @@ class DynamicWordsDistance(DynamicAbs):
 		return not self.getInfo(Response)
 
 
+class DynamicWordsMixed(DynamicAbs):
+	''' Abstraccion basada en la mezcla de los 2 anteriores'''
+	def __init__(self,var,method,req,logger):
+		DynamicAbs.__init__(self,var,method,req)
+		self.word=None
+		self.logger=logger
+
+	def addOrigResponse (self,OrigResponse):
+		self.origWords=getRESPONSEMd5(OrigResponse)
+
+	def getInfo(self,BadResponse):
+		'''Devuelve CIERTO si HAY DIFERENCIAS despues de una INYECCION'''
+		newWords=getRESPONSEMd5(BadResponse)
+
+		self.logger.debug("\tequal Response - Orig: %s, Current: %s" % (self.origWords,newWords))
+		if newWords!=self.origWords:
+			return True
+
+		dis=distance(self.origWords,newWords)
+
+		self.logger.debug("\tequal Response - Orig: %s, Current: %s, distance: %d" % (len(self.origWords),len(newWords),dis))
+		if dis<90:
+			return True
+		
+		return False
+
+	def equalResponse(self,Response):
+		return not self.getInfo(Response)
 
 
 class sqPyfia:
@@ -243,7 +270,8 @@ class sqPyfia:
 			HTMLNew.Substitute("x,'\"QnoVale","")
 	
 			#DynObj=DynamicErrWord(var,method,req,self.logger)
-			DynObj=DynamicWordsDistance(var,method,req,self.logger)
+			#DynObj=DynamicWordsDistance(var,method,req,self.logger)
+			DynObj=DynamicWordsMixed(var,method,req,self.logger)
 			DynObj.addOrigResponse(self.origResponse)
 			
 			var.restore()

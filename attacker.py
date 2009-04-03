@@ -6,6 +6,7 @@ import plugins
 import copy
 from logging import Logger,Handler
 import threading
+import re
 
 class PluginLogger(Logger):
 	def __init__(self):
@@ -41,9 +42,16 @@ class Attacker():
 		self.__LOGGER=PluginLogger()
 		self.__LOGGER.addHandler(PluginLogHandler())
 		self.getPlugins()
+		self.limitpath=None
 
 	def setProxy(self,str):
 		self.__proxy=str
+
+	def limitPath(self,regex):
+		if regex:
+			self.limitpath=re.compile(regex,re.I)
+		else:
+			self.limitpath=None
 
 	
 	def clearCache(self):
@@ -65,6 +73,8 @@ class Attacker():
 
 	def addReq(self,req):
 		if req:
+			if self.limitpath and not self.limitpath.findall(req.completeUrl):
+				return
 			req.setProxy(self.__proxy)
 			for i in self.plugins.values():
 				i.launch(copy.deepcopy(req))

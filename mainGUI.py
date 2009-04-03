@@ -828,7 +828,7 @@ class mainGUI(object):
         self.label_17.setText(QtGui.QApplication.translate("MainWindow", "You can add or modify existing headers while browsing. Eg: User-agent: FakeBrowser", None, QtGui.QApplication.UnicodeUTF8))
         self.label_8.setText(QtGui.QApplication.translate("MainWindow", "Header", None, QtGui.QApplication.UnicodeUTF8))
         self.label_7.setText(QtGui.QApplication.translate("MainWindow", "Value", None, QtGui.QApplication.UnicodeUTF8))
-        self.groupBox_5.setTitle(QtGui.QApplication.translate("MainWindow", "Path limit", None, QtGui.QApplication.UnicodeUTF8))
+        self.groupBox_5.setTitle(QtGui.QApplication.translate("MainWindow", "Path limit (Plugins and Crawler)", None, QtGui.QApplication.UnicodeUTF8))
         self.label_9.setText(QtGui.QApplication.translate("MainWindow", "Proxy will allow acces only to paths matching the following pattern (regex):", None, QtGui.QApplication.UnicodeUTF8))
         self.label_15.setText(QtGui.QApplication.translate("MainWindow", "eg: /pages/page[0-9]{2}.html            (will only allow access to urls containing /pages/pageXX.html where XX are numbers)", None, QtGui.QApplication.UnicodeUTF8))
         self.groupBox_6.setTitle(QtGui.QApplication.translate("MainWindow", "Use proxy", None, QtGui.QApplication.UnicodeUTF8))

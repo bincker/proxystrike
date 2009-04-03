@@ -89,7 +89,7 @@ class SearchLinks(SearchEngine):
 		return final
 
 class DCrawl(consoleNg.Console):
-	def __init__(self,threads=2,reject=[],store=False,proxy=None,regexpAvoid=None,cookie=None):
+	def __init__(self,threads=2,reject=[],store=False,proxy=None,cookie=None):
 
 		self.FormAnalysis=WebAnalyzer(forms=True)
 		self.running=False
@@ -118,15 +118,23 @@ class DCrawl(consoleNg.Console):
 		self.Semaphore=threading.BoundedSemaphore(value=self.CFG_threads)
 		self.Semaphore_Mutex=threading.BoundedSemaphore(value=1)
 
-		if regexpAvoid:
-			self.reAvoid=re.compile(regexpAvoid)
-		else:
-			self.reAvoid=None
+		self.reReject=[]
+		self.reNeeded=None
 
 		consoleNg.Console.__init__(self,"dcrawl> ")
 		self.Handler=None
 
 		self.Requests=[]
+
+	def addReject(self,regex):
+		self.reReject.append(re.compile(regex,re.I))
+
+	def addNeeded(self,regex):
+		if regex:
+			self.reNeeded=re.compile(regex,re.I)
+		else:
+			self.reNeeded=None
+		
 
 	def reset(self):
 		self.running=False
@@ -143,7 +151,11 @@ class DCrawl(consoleNg.Console):
 
 	def continueWith(self,url):
 		if url not in self.Done:
-			if self.reAvoid and self.reAvoid.findall(url):
+			for i in self.reReject:
+				if i.findall(url):
+					return False
+			if self.reNeeded and not self.reNeeded.findall(url):
+				print url
 				return False
 			return True
 		return False

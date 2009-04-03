@@ -694,7 +694,7 @@ class Ui_MainWindow(mainGUI):
 			
 		Proxynet.signGET(getsign)
 		Proxynet.signHeaders(headersign, valuesign)
-		Proxynet.limitPath(limitpath)
+		self.controller.limitPath(limitpath)
 		if proxy:
 			Proxynet.setProxy(proxy)
 			self.controller.setProxy(proxy)

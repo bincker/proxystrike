@@ -22,11 +22,16 @@ class Controller:
 		self.attacker=Attacker()
 
 		self.crawler=DCrawl()
+#		self.crawler.addReject("cerrarSesion")
 		self.crawlerDomainInput=None
 		self.crawlerOn=False
 
 		self.uniqForms={}
 		self.crawlForward=False	
+
+	def limitPath(self,path):
+		self.crawler.addNeeded(path)
+		self.attacker.limitPath(path)
 
 	def setCrawlerForward(self,bl):
 		self.crawlForward=bl

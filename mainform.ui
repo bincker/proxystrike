@@ -687,7 +687,7 @@ p, li { white-space: pre-wrap; }
         <item>
          <widget class="QGroupBox" name="groupBox_5" >
           <property name="title" >
-           <string>Path limit</string>
+           <string>Path limit (Plugins and Crawler)</string>
           </property>
           <layout class="QVBoxLayout" >
            <item>
