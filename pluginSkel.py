@@ -19,7 +19,9 @@ class AttackPlugin:
 
 		self.enabled=False
 
-		self.cache={}
+		self.cacheVars={}
+		self.cacheCompleteUrl={}
+
 		self.reqpool=[]
 
 		self.nthreads=1
@@ -51,10 +53,15 @@ class AttackPlugin:
 		self.LOG=loger
 
 	def putRESULTS(self,res,req=None):
-		self.RESULTS.append(res)
-		self.newRESULTS.append(res)
-		if req:
-			self.reqRESULTS.append(req)
+		self.Semaphore_Mutex.acquire()
+		try:
+			self.RESULTS.append(res)
+			self.newRESULTS.append(res)
+			if req:
+				self.reqRESULTS.append(req)
+		except a:
+			self.LOG.debug(str(a))
+		self.Semaphore_Mutex.release()
 
 
 	def setThreads(self,n):
@@ -128,32 +135,40 @@ class AttackPlugin:
 
 
 	def __updateCache(self,req):
+		if not self.variableSet:
+			cu=req.completeUrl
+			if cu in self.cacheCompleteUrl:
+				return False
+			else:
+				self.cacheCompleteUrl[cu]=True
+				return True
+		else:
 
-		key=req.urlWithoutVariables
-		dicc={}
-		for j in [i.name for i in req.getGETVars()]:
-			dicc[j]=True
-		for j in [i.name for i in req.getPOSTVars()]:
-			dicc[j]=True
+			key=req.urlWithoutVariables
+			dicc={}
+			for j in [i.name for i in req.getGETVars()]:
+				dicc[j]=True
+			for j in [i.name for i in req.getPOSTVars()]:
+				dicc[j]=True
 
-		vars=dicc.keys()
+			vars=dicc.keys()
 
-		if self.variableSet:
 			if not vars:
 				return False
 
-		vars.sort()
+			vars.sort()
 
-		key+="-"+"-".join(vars)
+			key+="-"+"-".join(vars)
 
 
-		if not key in self.cache:
-			self.cache[key]=True
-			return True
-		return False
+			if not key in self.cacheVars:
+				self.cacheVars[key]=True
+				return True
+			return False
 
 	def clearCache(self):
-		self.cache={}
+		self.cacheVars={}
+		self.cacheCompleteUrl={}
 
 	def getResults(self):
 		return self.RESULTS[:]

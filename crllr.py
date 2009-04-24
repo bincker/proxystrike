@@ -22,7 +22,6 @@ class Controller:
 		self.attacker=Attacker()
 
 		self.crawler=DCrawl()
-#		self.crawler.addReject("cerrarSesion")
 		self.crawlerDomainInput=None
 		self.crawlerOn=False
 
@@ -85,6 +84,8 @@ class Controller:
 
 	def updateStats(self,req):
 		i=req
+		if not i:
+			return
 
 		######### ACTUALIZAMOS VARIABLE STATS ####################
 		if not self.variableStats.has_key(i.urlWithoutPath):
@@ -163,8 +164,9 @@ class Controller:
 						self.crawler.setCookie(ck)
 
 		reqs=self.crawler.getRequests()
-		if self.crawlForward:
-			for i in reqs:
+		for i in reqs:
+			self.updateStats(i)
+			if self.crawlForward:
 				self.attacker.addReq(i)
 
 

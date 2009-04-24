@@ -19,12 +19,36 @@ try:
 except:
 	pass
 
+
+class crawlGraph:
+	def __init__(self):
+		self.nodeHash={}
+		self.rootNode=None
+
+	def addNode(self,url,parent):
+		
+		if not parent:
+			if self.rootNode:
+				raise Exception,"Error: 2 root nodes!"
+			self.rootNode=crawlNode(url)
+			
+
+class crawlNode:
+	def __init__(self,url):
+		self.childNodes=[]
+		self.url=url
+	
+	def addChild(self,url):
+		self.childNodes.append(url)
+
+	def __str__(self):
+		return self.url
+
 class SearchLinks(SearchEngine):
 	reInput=re.compile("<input[^>]+>",re.I)
 	reIlegalChar=re.compile("%[0189abcfef][0-9abcdef]",re.I)
 	reXtensions=re.compile("^ *[/a-z0-9_\.@\$%()!-]+\.[a-z0-9]{2,5}(;[^\?]+)?(\?.*)?$",re.I)
 	reDundance=re.compile("(/\./|/[^/]+/\.\./|/{2,})")
-	#reDundance=re.compile("(/\.\./[^/]+/|/{2,})")
 
 	def __init__(self,url):
 		SearchEngine.__init__(self,url)
@@ -127,9 +151,14 @@ class DCrawl(consoleNg.Console):
 		self.Requests=[]
 
 	def addReject(self,regex):
+		'''para paths que no se quieren visitar'''
 		self.reReject.append(re.compile(regex,re.I))
 
+	def getRejects(self):
+		return self.reReject
+
 	def addNeeded(self,regex):
+		'''Regexp que se debe cumplir para que se visite la url'''
 		if regex:
 			self.reNeeded=re.compile(regex,re.I)
 		else:
@@ -150,6 +179,7 @@ class DCrawl(consoleNg.Console):
 		
 
 	def continueWith(self,url):
+		'''Logica que decide si se visita o no una URL'''
 		if url not in self.Done:
 			for i in self.reReject:
 				if i.findall(url):
@@ -161,6 +191,7 @@ class DCrawl(consoleNg.Console):
 		return False
 
 	def __setattr__(self,item,value):
+		'''Utilizado nada mas para la version consola'''
 		if item=="CFG_threads":
 			if self.running:
 				raise Exception,"Crawler running!!! Wait to finish"
@@ -173,82 +204,15 @@ class DCrawl(consoleNg.Console):
 
 
 	def __getattr__(self,item):
+		'''Utilizado nada mas para la version consola'''
 		if item=="CFG_threads":
 			return self.threads
 		else:
 			raise AttributeError(item)
 
-	
-	def CMD_append(self,*args):
-		'''1|append [url]|add an Url to the crawler POOL'''
-		self.append(args[0])
-
-	def CMD_setCookie(self,*args):
-		'''2|setCookie [ck]|Set cookie for crawling'''
-		self.setCookie(args[0])
-		
-
-	def CMD_status(self,*args):
-		'''3|status|prints urls_done/remaining_urls'''
-		print self.doneUrls,"/",self.totalUrls
-
-	def CMD_wait(self,*args):
-		'''4|wait|Waits for crawler to finish'''
-		try:
-			while self.running:
-				print self.doneUrls,"/",self.totalUrls
-				sleep(3)
-		except:
-			print "Wait command interrupted"
-
-	def CMD_tohtml(self,*args):
-		'''9|tohtml|Writes results to html and open webbrowser'''
-
-		forms="".join([ "Form: <a href='"+i+"'>"+i+"</a><br>" for i in self.FormAnalysis.formSummary().values()])
-		dynurls= "".join([ "<a href='"+i+"'>"+i+"</a><br>" for i in self.FormAnalysis.getDynPages()])
-		exts=""#<br".join(["<h3>"+i+"</h3><br>"+"<br>".join(j) for i,j in self.FormAnalysis.getByextensions().items()])
-		
-
-		html="<html><body></body><h1>Uniq forms</h1><br>%s<h1>Dyn Urls</h1><br>%s<br>%s</html>" % (forms,dynurls,exts)
-
-		f=open("temp.html","w")
-		f.write(html)
-		f.close()
-
-		print "File written: temp.html"
-
-		webbrowser.open("temp.html")
-
-	def CMD_stop(self,*args):
-		'''5|stop|Stops crawling process'''
-		print "Stopping..."
-		self.stop()
-		print "Stopped! ;D"
-
-	def CMD_restart(self,*args):
-		'''6|restart|restart Crawling process'''
-		self.restart()
-
-	def CMD_testsearch(self,*args):
-		'''7|testsearch [url]|Perform a search to test Link detector'''
-		i=SearchLinks(args[0])
-		i.addCookie(self.CFG_cookie)
-		for j in i:
-			print j
-
-	def CMD_dumpurls(self,*args):
-		'''8|dumpurls|Dump valid url's in dumpurls.txt'''
-		f=open("dumpurls.txt","w")
-		for i in self.urlOKS:
-			f.write(i+"\r\n")
-		f.close()
-		
-		
-		
 
 	def status(self):
 		return self.doneUrls,self.totalUrls
-		
 	
 	def stop(self):
 		self.running=False
@@ -262,6 +226,7 @@ class DCrawl(consoleNg.Console):
 		self.Launch()
 	
 	def append(self,url):
+		'''append una url en el pool de salida y ejecuta el carwler si esta parado'''
 		if self.continueWith(url):
 			self.Semaphore_Mutex.acquire()
 			self.totalUrls+=1
@@ -276,6 +241,7 @@ class DCrawl(consoleNg.Console):
 				self.Launch()
 
 	def postFetch(self,str,url):
+		'''Funcion que agrega las urls al pool final o bien guarda todo a HDD'''
 		if str:
 			if self.CFG_store:
 				_,dom,path,pre,vars,_=urlparse(url)
@@ -313,30 +279,25 @@ class DCrawl(consoleNg.Console):
 				self.FormAnalysis.appendPage(str,url)
 
 	def getForms(self):
+		'''deprecated'''
 		dic=self.FormAnalysis.formSummary()
 
 		for i,j in dic.items():
 			print j,i
 
 	def getDynPages(self):
+		'''deprecated'''
 		for i in self.FormAnalysis.getDynPages():
 			print i
 
 
 	def getInfo(self):
+		'''deprecated'''
 		print self.FormAnalysis.infoSummary()
 			
 	def wait(self):
 		while self.running:
 			sleep(1)
-
-
-	def getPool(self):
-		if not self.POOL:
-			return None
-
-		a=self.POOL.pop(0)
-		return a
 
 	def getAllPools(self):
 		res=self.POOL
@@ -417,6 +378,7 @@ class DCrawl(consoleNg.Console):
 		self.CFG_cookie=sk
 
 	def getRequests(self):
+		'''Obtiene las peticiones lanzadas para cada busqueda'''
 		self.Semaphore_Mutex.acquire()
 		a=self.Requests[:]
 		self.Requests=[]
@@ -426,6 +388,79 @@ class DCrawl(consoleNg.Console):
 	def setProxy(self,proxy):
 		self.CFG_proxy=proxy
 
+######################################## COMANDOS VERISION CONSOLA ##########################################
+######################################## COMANDOS VERISION CONSOLA ##########################################
+######################################## COMANDOS VERISION CONSOLA ##########################################
+######################################## COMANDOS VERISION CONSOLA ##########################################
+	
+	def CMD_append(self,*args):
+		'''1|append [url]|add an Url to the crawler POOL'''
+		self.append(args[0])
+
+	def CMD_setCookie(self,*args):
+		'''2|setCookie [ck]|Set cookie for crawling'''
+		self.setCookie(args[0])
+		
+
+	def CMD_status(self,*args):
+		'''3|status|prints urls_done/remaining_urls'''
+		print self.doneUrls,"/",self.totalUrls
+
+	def CMD_wait(self,*args):
+		'''4|wait|Waits for crawler to finish'''
+		try:
+			while self.running:
+				print self.doneUrls,"/",self.totalUrls
+				sleep(3)
+		except:
+			print "Wait command interrupted"
+
+	def CMD_tohtml(self,*args):
+		'''9|tohtml|Writes results to html and open webbrowser'''
+
+		forms="".join([ "Form: <a href='"+i+"'>"+i+"</a><br>" for i in self.FormAnalysis.formSummary().values()])
+		dynurls= "".join([ "<a href='"+i+"'>"+i+"</a><br>" for i in self.FormAnalysis.getDynPages()])
+		exts=""#<br".join(["<h3>"+i+"</h3><br>"+"<br>".join(j) for i,j in self.FormAnalysis.getByextensions().items()])
+		
+
+		html="<html><body></body><h1>Uniq forms</h1><br>%s<h1>Dyn Urls</h1><br>%s<br>%s</html>" % (forms,dynurls,exts)
+
+		f=open("temp.html","w")
+		f.write(html)
+		f.close()
+
+		print "File written: temp.html"
+
+		webbrowser.open("temp.html")
+
+	def CMD_stop(self,*args):
+		'''5|stop|Stops crawling process'''
+		print "Stopping..."
+		self.stop()
+		print "Stopped! ;D"
+
+	def CMD_restart(self,*args):
+		'''6|restart|restart Crawling process'''
+		self.restart()
+
+	def CMD_testsearch(self,*args):
+		'''7|testsearch [url]|Perform a search to test Link detector'''
+		i=SearchLinks(args[0])
+		i.addCookie(self.CFG_cookie)
+		for j in i:
+			print j
+
+	def CMD_dumpurls(self,*args):
+		'''8|dumpurls|Dump valid url's in dumpurls.txt'''
+		f=open("dumpurls.txt","w")
+		for i in self.urlOKS:
+			f.write(i+"\r\n")
+		f.close()
+		
+	def CMD_reject(self,regex):
+		'''9|reject [regex]| rejects URLS whith the pattern regex'''
+		self.addReject(regex)
+		
 if __name__=="__main__":
 	a=DCrawl()
 	a.run()

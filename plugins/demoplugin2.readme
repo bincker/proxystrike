@@ -1,0 +1,106 @@
+## Plugin to detect emails and show them in a text field
+
+##
+## If you want to try this plugind and modify, simply rename it to .py
+## This is a good template to create a new plugin
+## Please read the instrucions below
+##
+## It's VERY IMPORTANT that you know how to use reqresp! it's very easy, please read reqresp.py to work with request and responses :D
+##
+
+
+from pluginSkel import AttackPlugin
+import re
+
+# AttackPlugin is the plug-in superclass
+#
+# Next i'll explain how to create a plugin:
+# 
+#		MyPLugin(AttackPlugin)                  --> Your class must inherit from AttackPlugin :D
+#														
+#			def __init__(self):	
+#				AttackPlugin.__init__(self, ... PARAMETERS ...) You must invoke superclass constructor 
+#			
+#		+++ Constructor Parameters (in order): 
+#				name: Name of the module (will be shown in Proxystrike)		
+#
+#				variableSet(True or False):
+#					True: Process one time the same variable set (proxystrike handles a cache)   
+#					False: Process all the requests processed by proxystrike
+#
+#				iface(True or False): Specify if the plugin will be shown in the GUI (plugin may not have interface)
+#
+#				infoType: infotype is the output format of the plugin. in can be "tree" or "text"
+#					tree: Information will be structured in a TreeView widget
+#					text: Information will be appended in a textEdit widget
+#
+#				fields: if infoType="tree", the tree widget need the text on the fileds shown in the header, so
+#					this parameter is a list of strings containing the header fields
+#
+#
+#
+#
+# Once the constructur is defined you have to overload some functions:
+#	
+#	def process(request)	---		Required
+#		This function receives directly request objects from ProxyStrike
+#
+#	def getHTML()			---		Optional	(Beta and deprecated ??? WTF?!?!?! I dnt knw...)
+#		This function returns data to create an html output of the plugin
+#
+#	def getXML()			---		Optional
+#		This function returns data to create an XML output of the plugin
+#		it is a list of Element objects of minidom Python API
+#
+#
+#
+#
+# Implementing PROCESS method:
+#	After processing the request and/or its response, the information gathered using self.putRESULTS(result,request=None) method
+#	but the format depends on INFOTYPE variable. If you append a request moreover when doubleclick it in the tree it will be 
+#	forwarded to the REPEATER module.
+#	
+#	infotype==text --> The data type passed to self.putRESULTS() can be of any type, because proxystrike will 
+#						perform an str() call to the data type and will append the result to de textArea
+#
+#	infotype==tree --> For filling a tree structure is used a tree of dicts :S (it seems hard to explain)
+#					
+#			!!! Trees can be only 1 level depht, and the root node is allways the first field
+#
+#		example of tree:
+#
+#								Headers:	A		B		C		D
+#											info1
+#											|_		info2	info3	info4						
+#
+#						Data structure of a result:	['info1',['info2','info3',info4']]
+#
+#								Headers:	A		B		C		D
+#											info1
+#											|_		info2	info3	info4						
+#											|_		info21	info32	info43						
+#
+#						Data structure of a result:	['info1',['info2','info3',info4'],['info21','info32','info43']]
+#					
+
+
+class email_detect(AttackPlugin):
+	def __init__(self):
+		# Name, variableSet ,iface, infoType, fields
+		AttackPlugin.__init__(self,name="email detect",variableSet=False,iface=True,type="text")
+
+		# we create a regexp to detect emails in a text 
+		self.emailre=re.compile("[a-z0-9_.-]+@[a-z0-9_.-]+",re.I)
+
+		self.mails={}
+
+	def process(self,req):
+		html=req.response.getContent()
+
+		a=self.emailre.findall(html)
+
+		for i in a:
+			if i not in self.mails:
+				self.mails[i]=True
+				self.putRESULTS("%s, " % (i))   
+

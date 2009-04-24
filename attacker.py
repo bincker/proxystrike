@@ -2,11 +2,14 @@
 #Covered by GPL V2.0
 #Coded by Carlos del Ojo Elias (deepbit@gmail.com)
 
-import plugins
 import copy
 from logging import Logger,Handler
 import threading
 import re
+import os
+import imp
+import inspect
+
 
 class PluginLogger(Logger):
 	def __init__(self):
@@ -89,9 +92,21 @@ class Attacker():
 		return self.plugins[pluginame].getHTML()
 
 	def getPlugins(self):               
-		plugs=[i for i in dir(plugins) if "AttackMod_" in i]
+		files=[os.path.join("plugins",i).split(".")[0] for i in  os.listdir(os.path.join("plugins")) if os.path.isfile(os.path.join("plugins",i)) and i[-2:].lower()=="py"]
+		
+		plugs=[]
+		
+		for i in files:
+			j,k,l= imp.find_module(i)
+			m= imp.load_module(i, j,k,l)
+			j.close()
+			for j in dir (m):
+				if inspect.isclass(getattr(m,j)):
+					if '_AttackPlugin__processor' in dir(getattr(m,j)) and j!="AttackPlugin":
+						plugs.append(getattr(m,j)) 
+		
 		for i in plugs:
-			pl=getattr(plugins,i)()
+			pl=i()
 			pl.setLogger(self.__LOGGER)
 			self.plugins[pl.pluginName]=pl
 

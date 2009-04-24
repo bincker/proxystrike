@@ -138,7 +138,7 @@ class SearchEngine:
 		trys=5
 		while trys:
 			try:
-				req.perform()
+   				req.perform()
 				break
 			except:
 				trys-=1
@@ -147,7 +147,7 @@ class SearchEngine:
 					raise StopIteration
 				pass
 
-		if not req.response.has_header('Content-Type') or not 'text' in req.response['Content-Type']:
+		if not req.response.has_header('Content-Type') or (not 'text' in req.response['Content-Type'] and not 'script' in req.response['Content-Type']) :
 			self.MoreResults=False
 			return
 

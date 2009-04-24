@@ -339,21 +339,32 @@ class Request:
 			list+=["%s: %s" % (i,j)]
 		return list
 
-###############	def head(self):
-###############		conn=pycurl.Curl()
-###############		conn.setopt(pycurl.SSL_VERIFYPEER,False)
-###############		conn.setopt(pycurl.SSL_VERIFYHOST,1)
-###############		conn.setopt(pycurl.URL,self.completeUrl)
-###############
-###############		conn.setopt(pycurl.HEADER, True) # estas dos lineas son las que importan
-###############		conn.setopt(pycurl.NOBODY, True) # para hacer un pedido HEAD
-###############
-###############		conn.setopt(pycurl.WRITEFUNCTION, self.header_callback)
-###############		conn.perform()
-###############
-###############		rp=Response()
-###############		rp.parseResponse(self.__performHead)
-###############		self.response=rp
+	def head(self):
+		conn=pycurl.Curl()
+		conn.setopt(pycurl.SSL_VERIFYPEER,False)
+		conn.setopt(pycurl.SSL_VERIFYHOST,1)
+		conn.setopt(pycurl.URL,self.completeUrl)
+
+		conn.setopt(pycurl.HEADER, True) # estas dos lineas son las que importan
+		conn.setopt(pycurl.NOBODY, True) # para hacer un pedido HEAD
+
+		conn.setopt(pycurl.WRITEFUNCTION, self.header_callback)
+		conn.perform()
+
+		rp=Response()
+		rp.parseResponse(self.__performHead)
+		self.response=rp
+
+	def createPath(self,newpath):
+		'''Creates new url from a location header || Hecho para el followLocation=true'''
+		if "http" in newpath[:4].lower():
+			return newpath
+
+		parts=urlparse(self.completeUrl)
+		if "/" != newpath[0]:
+			newpath="/".join(parts[2].split("/")[:-1])+"/"+newpath
+
+		return urlunparse([parts[0],parts[1],newpath,'','',''])
 
 	def perform(self):
 		global REQLOG
@@ -420,19 +431,21 @@ class Request:
 		if self.followLocation:
 			if self.response.getLocation():
 				a=Request()
-				url=urlparse(self.response.getLocation())
-				if not url[0] or not url[1]:
-					sc=url[0]
-					h=url[1]
-					if not sc:
-						sc=self.schema
-					if not h:
-						h=self.__host
-					a.setUrl(urlunparse((sc,h)+url[2:]))
-					self.__finalurl=urlunparse((sc,h)+url[2:])
-				else:
-					a.setUrl(self.response.getLocation())
-					self.__finalurl=self.response.getLocation()
+				newurl=self.createPath(self.response.getLocation())
+				a.setUrl(newurl)
+				#url=urlparse(self.response.getLocation())
+				#if not url[0] or not url[1]:
+				#	sc=url[0]
+				#	h=url[1]
+				#	if not sc:
+				#		sc=self.schema
+				#	if not h:
+				#		h=self.__host
+				#	a.setUrl(urlunparse((sc,h)+url[2:]))
+				#	self.__finalurl=urlunparse((sc,h)+url[2:])
+				#else:
+				#	a.setUrl(self.response.getLocation())
+				#	self.__finalurl=self.response.getLocation()
 				a.setProxy(self.__proxy)
 
 				ck=""

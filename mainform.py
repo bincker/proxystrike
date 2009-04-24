@@ -508,7 +508,7 @@ class Ui_MainWindow(mainGUI):
 						targetTree2=QtGui.QTreeWidgetItem(target2)
 						targetTree.addChild(targetTree2)
 			elif j[0]=="text":
-				self.resultsWidgets[plugin].appendHtml(str(j[1]))
+				self.resultsWidgets[plugin].append("".join(j[1]))
 
 
 
