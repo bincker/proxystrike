@@ -1,6 +1,6 @@
 from tools.gazpacho.Gazpacho import *
 from tools.htmlout import *
-from pluginSkel import AttackPlugin
+from tools.pluginSkel import AttackPlugin
 
 class AttackMod_gazpacio(AttackPlugin):
 	def __init__(self):

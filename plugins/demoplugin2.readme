@@ -9,7 +9,7 @@
 ##
 
 
-from pluginSkel import AttackPlugin
+from tools.pluginSkel import AttackPlugin
 import re
 
 # AttackPlugin is the plug-in superclass

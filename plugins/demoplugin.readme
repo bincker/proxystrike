@@ -8,7 +8,7 @@
 ## It's VERY IMPORTANT that you know how to use reqresp! it's very easy, please read reqresp.py to work with request and responses :D
 ##
 
-from pluginSkel import AttackPlugin
+from tools.pluginSkel import AttackPlugin
 import re
 
 # AttackPlugin is the plug-in superclass

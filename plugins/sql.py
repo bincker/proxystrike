@@ -1,6 +1,6 @@
 from tools.sqpyfia.sqPyfia import sqPyfia
 from tools.htmlout import *
-from pluginSkel import AttackPlugin
+from tools.pluginSkel import AttackPlugin
 
 class AttackMod_sqPyfia(AttackPlugin):
 	def __init__(self):
