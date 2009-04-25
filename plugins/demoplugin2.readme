@@ -40,7 +40,7 @@ import re
 #
 #
 #
-# Once the constructur is defined you have to overload some functions:
+# Once the constructor has been defined you have to overload some functions:
 #	
 #	def process(request)	---		Required
 #		This function receives directly request objects from ProxyStrike

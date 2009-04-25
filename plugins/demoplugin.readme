@@ -8,7 +8,6 @@
 ## It's VERY IMPORTANT that you know how to use reqresp! it's very easy, please read reqresp.py to work with request and responses :D
 ##
 
-
 from pluginSkel import AttackPlugin
 import re
 
@@ -40,7 +39,7 @@ import re
 #
 #
 #
-# Once the constructur is defined you have to overload some functions:
+# Once the constructor has been defined you have to overload some functions:
 #	
 #	def process(request)	---		Required
 #		This function receives directly request objects from ProxyStrike
@@ -82,7 +81,6 @@ import re
 #
 #						Data structure of a result:	['info1',['info2','info3',info4'],['info21','info32','info43']]
 #					
-
 
 class email_detect(AttackPlugin):
 	def __init__(self):

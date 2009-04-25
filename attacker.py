@@ -37,7 +37,7 @@ class PluginLogHandler(Handler):
 		return a
 
 
-class Attacker():
+class Attacker:
 
 	def __init__ (self):
 		self.__proxy=None
@@ -92,14 +92,16 @@ class Attacker():
 		return self.plugins[pluginame].getHTML()
 
 	def getPlugins(self):               
-		files=[os.path.join("plugins",i).split(".")[0] for i in  os.listdir(os.path.join("plugins")) if os.path.isfile(os.path.join("plugins",i)) and i[-2:].lower()=="py"]
+		files=[os.path.join("plugins",i) for i in  os.listdir(os.path.join("plugins")) if os.path.isfile(os.path.join("plugins",i)) and i[-2:].lower()=="py"]
 		
 		plugs=[]
 		
 		for i in files:
-			j,k,l= imp.find_module(i)
-			m= imp.load_module(i, j,k,l)
-			j.close()
+			fo=open(i,"U")
+			name=os.path.split(i)[-1].split(".")[0]
+			m=imp.load_module(name,fo,i,(".py","U",1))
+
+			fo.close()
 			for j in dir (m):
 				if inspect.isclass(getattr(m,j)):
 					if '_AttackPlugin__processor' in dir(getattr(m,j)) and j!="AttackPlugin":
